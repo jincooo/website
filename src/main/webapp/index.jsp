@@ -49,7 +49,7 @@
 	var mapOptions = 
 	{
 	    center: new naver.maps.LatLng(center_lat, center_lng),
-	    zoom: 14
+	    zoom: 16
 	    
 	};
 	
