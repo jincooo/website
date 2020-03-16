@@ -37,6 +37,7 @@
 	
 	viewFn(37.258302,127.023449);
 	
+	
 	function viewFn(lat,lng)
 	{
 		var markerOptions;
@@ -49,11 +50,11 @@
 		}else if(map.zoom<=20){
 			range = "1000";
 		}else if(map.zoom<=18){
-			range = "2000";
+			range = "1500";
 		}else if(map.zoom<=16){
-			range = "3000";
+			range = "2000";
 		}else if(map.zoom<=14){
-			range = "5000";
+			range = "3000";
 		}else {
 			return ;
 		}
