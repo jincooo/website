@@ -11,28 +11,6 @@
 
 <body>
 
-	<div>
-        <form action="/sample.do" method="post">
-            <button onclick="submit"><img class="btn-img" src="/resources/images/mask_green.png">처음 만든 버튼555555</button>
-        </form>
-    </div>
-<!-- 
-    <script>
-    $(document).ready(function()
-    { 
-    	$.getJSON('https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json', function(data)
-    		{
-    		var html = [];
-    		$.each(data["stores"], function(i, item) 
-    		{
-    			alert("i : "+i+" item.lat :"+item.lat +" item.lng : "+item.lng);
-    		});
-    	});
-    });
- 
-    </script>
--->
-    
 	<div id="map" style="width:100%;height:900px;"></div>
 
 	<script>
@@ -42,7 +20,7 @@
 	
 	var suwon_lat = 37.258302;
 	var suwon_lng = 127.023449;
-	var range = 3000;
+	var range = 1000;
 	
 	var mask_lat = suwon_lat;
 	var mask_lng = suwon_lng;
@@ -56,7 +34,6 @@
 	
 	var map = new naver.maps.Map('map', mapOptions);
 	
-	
 	viewFn(37.258302,127.023449);
 	
 	function viewFn(lat,lng)
@@ -64,8 +41,22 @@
 		var markerOptions;
 		var imgurl;
 		var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?';
+		
+		if(map.zoom<=22){
+			range = "500";
+		}else if(map.zoom<=20){
+			range = "1000";
+		}else if(map.zoom<=18){
+			range = "2000";
+		}else if(map.zoom<=16){
+			range = "3000";
+		}else if(map.zoom<=14){
+			range = "5000";
+		}else {
+			return ;
+		}
+		
 		var urlParam= "lat=" + lat + "&lng=" + lng + "&m=" + range;
-		//alert(url+urlParam);
 		
 	    $(document).ready(function()
 	    { 
@@ -133,16 +124,4 @@
 	//alert(window.HOME_PATH);
 	</script>
 	</body>
-	
-<!--
- 
-<body>
-	<strong>처음시작하는4 index.jsp</strong>
-	<div>
-        <form action="/sample.do" method="post">
-            <button onclick="submit"><img class="btn-img" src="/assets/images/mask_green.png">처음 만든 버튼111111</button>
-        </form>
-    </div>
-</body>
- -->
 </html>
