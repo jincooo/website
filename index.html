@@ -71,27 +71,27 @@
 	    			
 	    			 if(item.remain_stat == "plenty")
 			        {
-	   					imgurl = '/resources/images/mask_green.png';
+	   					imgurl = '/website/resources/images/mask_green.png';
 	   					remain_stat_temp = "100개 이상";
 			        }
 			        else if(item.remain_stat == "some")
 		        	{
-			        	imgurl = '/resources/images/mask_yellow.png';
+			        	imgurl = '/website/resources/images/mask_yellow.png';
 			        	remain_stat_temp = "30개 이상 100개미만";
 		        	}
 			        else if(item.remain_stat == "few")
 		        	{
-			        	imgurl = '/resources/images/mask_red.png';
+			        	imgurl = '/website/resources/images/mask_red.png';
 			        	remain_stat_temp = "2개 이상 30개 미만";
 		        	}
 			        else if(item.remain_stat == "empty")
 		        	{
-			        	imgurl = '/resources/images/mask_gray.png';
+			        	imgurl = '/website/resources/images/mask_gray.png';
 			        	remain_stat_temp = "1개 이하";
 		        	}
 			        else
 		        	{
-			        	imgurl = '/resources/images/mask_sale_stop.png';
+			        	imgurl = '/website/resources/images/mask_sale_stop.png';
 			        	remain_stat_temp = "판매중지";
 		        	}
 	    			
@@ -109,6 +109,7 @@
 	    			
 	    			};
 	        		var marker = new naver.maps.Marker(markerOptions);
+	        		console.log("test : "+imgurl);
 	        		
 	        		var contentString = [
 	        	        '<div class="iw_inner">',
@@ -139,9 +140,6 @@
 	    });
 	}
 	
-	
-	
-	
     naver.maps.Event.addListener(map, "dragend", function(e) {
     	viewFn(map.getCenter().lat(),map.getCenter().lng());
     });
@@ -152,9 +150,6 @@
     	
     });
     
-	
-		
-	//alert(window.HOME_PATH);
 	</script>
 	</body>
 </html>
