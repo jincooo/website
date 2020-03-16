@@ -4,13 +4,13 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <title>간단한 지도 표시하기</title>
+    <title>공적마스크 재고 조회 사이트</title>
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=dl4sr4ygcb"></script>
     <script src = "https://code.jquery.com/jquery-3.2.1.min.js"> </script>
 </head>
 
 <body>
-
+	<h1>공적마스크 재고 현황 조회 사이트</h1>
 	<div id="map" style="width:100%;height:900px;"></div>
 
 	<script>
@@ -24,11 +24,12 @@
 	
 	var mask_lat = suwon_lat;
 	var mask_lng = suwon_lng;
+	var markers = [];
 	
 	var mapOptions = 
 	{
 	    center: new naver.maps.LatLng(suwon_lat, suwon_lng),
-	    zoom: 16
+	    zoom: 18
 	    
 	};
 	
@@ -40,6 +41,7 @@
 	{
 		var markerOptions;
 		var imgurl;
+		var remain_stat_temp;
 		var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?';
 		
 		if(map.zoom<=22){
@@ -47,11 +49,11 @@
 		}else if(map.zoom<=20){
 			range = "1000";
 		}else if(map.zoom<=18){
-			range = "2000";
+			range = "1500";
 		}else if(map.zoom<=16){
-			range = "3000";
+			range = "2000";
 		}else if(map.zoom<=14){
-			range = "5000";
+			range = "3000";
 		}else {
 			return ;
 		}
@@ -68,22 +70,62 @@
 	    			mask_lat = item.lat;
 	    			mask_lng = item.lng;
 	    			
-	    			 if(item.remain_stat == "plenty")
-			        {
-	   					imgurl = '/resources/images/mask_green.png';
-			        }
-			        else if(item.remain_stat == "some")
-		        	{
-			        	imgurl = '/resources/images/mask_yellow.png';
-		        	}
-			        else if(item.remain_stat == "few")
-		        	{
-			        	imgurl = '/resources/images/mask_red.png';
-		        	}
-			        else
-		        	{
-			        	imgurl = '/resources/images/mask_gray.png';
-		        	}
+	    			if(document.location.href == "http://localhost:8080/")
+	    			{
+	    				if(item.remain_stat == "plenty")
+				        {
+		   					imgurl = '/resources/images/mask_green.png';
+		   					remain_stat_temp = "100개 이상";
+				        }
+				        else if(item.remain_stat == "some")
+			        	{
+				        	imgurl = '/resources/images/mask_yellow.png';
+				        	remain_stat_temp = "30개 이상 100개미만";
+			        	}
+				        else if(item.remain_stat == "few")
+			        	{
+				        	imgurl = '/resources/images/mask_red.png';
+				        	remain_stat_temp = "2개 이상 30개 미만";
+			        	}
+				        else if(item.remain_stat == "empty")
+			        	{
+				        	imgurl = '/resources/images/mask_gray.png';
+				        	remain_stat_temp = "1개 이하";
+			        	}
+				        else
+			        	{
+				        	imgurl = '/resources/images/mask_sale_stop.png';
+				        	remain_stat_temp = "판매중지";
+			        	}
+	    			}
+	    			else
+	    			{
+		    			if(item.remain_stat == "plenty")
+				        {
+		   					imgurl = '/website/resources/images/mask_green.png';
+		   					remain_stat_temp = "100개 이상";
+				        }
+				        else if(item.remain_stat == "some")
+			        	{
+				        	imgurl = '/website/resources/images/mask_yellow.png';
+				        	remain_stat_temp = "30개 이상 100개미만";
+			        	}
+				        else if(item.remain_stat == "few")
+			        	{
+				        	imgurl = '/website/resources/images/mask_red.png';
+				        	remain_stat_temp = "2개 이상 30개 미만";
+			        	}
+				        else if(item.remain_stat == "empty")
+			        	{
+				        	imgurl = '/website/resources/images/mask_gray.png';
+				        	remain_stat_temp = "1개 이하";
+			        	}
+				        else
+			        	{
+				        	imgurl = '/website/resources/images/mask_sale_stop.png';
+				        	remain_stat_temp = "판매중지";
+			        	}
+	    			}
 	    			
 	    			markerOptions = 
 	    			{
@@ -99,29 +141,64 @@
 	    			
 	    			};
 	        		var marker = new naver.maps.Marker(markerOptions);
+	        		markers.push(marker);
+	        		
+	        		var contentString = [
+	        	        '<div class="iw_inner">',
+	        	        ' <h3>'+item.name+'</h3>',
+	        	        '  <p>주소 : '+item.addr+' <br>',
+	        	        '재고상태 : '+remain_stat_temp+' <br>',
+	        	        '입고시간 : '+item.stock_at+' <br>',
+	        	        '  </p>',
+	        	        '</div>'
+	        	    ].join('');
+
+	        		var infowindow = new naver.maps.InfoWindow({
+	        		    content: contentString
+	        		});
+	        		
+	        		naver.maps.Event.addListener(marker, "click", function(e) {
+	        		    if (infowindow.getMap()) {
+	        		        infowindow.close();
+	        		    } else {
+	        		        infowindow.open(map, marker);
+	        		    }
+	        		});
+	        		
+	        		naver.maps.Event.addListener(map, "click", function(e) {
+	        		    infowindow.close();
+	        		});
+	        		
 	    		});
+
+        		
+	    		
 	    	});
 	    });
 	}
 	
+	function reSetMaker()
+	{
+		for (var i = 0, leng = markers.length; i < leng ; i++)
+		{
+			markers[i].setMap(null);
+		}
+	}
+	
+	
 	
     naver.maps.Event.addListener(map, "dragend", function(e) {
-    		viewFn(map.getCenter().lat(),map.getCenter().lng());
-    		request = true;
-    	
+    	reSetMaker();
+    	viewFn(map.getCenter().lat(),map.getCenter().lng());
     });
     
     
     naver.maps.Event.addListener(map, "center_changed", function(e) {
-    	
-    		viewFn(map.getCenter().lat(),map.getCenter().lng());
-    		init = true;
+    	reSetMaker();
+    	viewFn(map.getCenter().lat(),map.getCenter().lng());
     	
     });
     
-	
-		
-	//alert(window.HOME_PATH);
 	</script>
 	</body>
 </html>
