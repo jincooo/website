@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
-    <title>간단한 지도 표시하기</title>
+    <title>공적마스크 재고 조회 사이트</title>
     <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=dl4sr4ygcb"></script>
     <script src = "https://code.jquery.com/jquery-3.2.1.min.js"> </script>
 </head>
@@ -28,7 +28,7 @@
 	var mapOptions = 
 	{
 	    center: new naver.maps.LatLng(suwon_lat, suwon_lng),
-	    zoom: 16
+	    zoom: 18
 	    
 	};
 	
@@ -40,6 +40,7 @@
 	{
 		var markerOptions;
 		var imgurl;
+		var remain_stat_temp;
 		var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?';
 		
 		if(map.zoom<=22){
@@ -71,18 +72,27 @@
 	    			 if(item.remain_stat == "plenty")
 			        {
 	   					imgurl = '/resources/images/mask_green.png';
+	   					remain_stat_temp = "100개 이상";
 			        }
 			        else if(item.remain_stat == "some")
 		        	{
 			        	imgurl = '/resources/images/mask_yellow.png';
+			        	remain_stat_temp = "30개 이상 100개미만";
 		        	}
 			        else if(item.remain_stat == "few")
 		        	{
 			        	imgurl = '/resources/images/mask_red.png';
+			        	remain_stat_temp = "2개 이상 30개 미만";
+		        	}
+			        else if(item.remain_stat == "empty")
+		        	{
+			        	imgurl = '/resources/images/mask_gray.png';
+			        	remain_stat_temp = "1개 이하";
 		        	}
 			        else
 		        	{
-			        	imgurl = '/resources/images/mask_gray.png';
+			        	imgurl = '/resources/images/mask_sale_stop.png';
+			        	remain_stat_temp = "판매중지";
 		        	}
 	    			
 	    			markerOptions = 
@@ -99,23 +109,46 @@
 	    			
 	    			};
 	        		var marker = new naver.maps.Marker(markerOptions);
+	        		
+	        		var contentString = [
+	        	        '<div class="iw_inner">',
+	        	        ' <h3>'+item.name+'</h3>',
+	        	        '  <p>주소 : '+item.addr+' <br>',
+	        	        '재고상태 : '+remain_stat_temp+' <br>',
+	        	        '입고시간 : '+item.stock_at+' <br>',
+	        	        '  </p>',
+	        	        '</div>'
+	        	    ].join('');
+
+	        		var infowindow = new naver.maps.InfoWindow({
+	        		    content: contentString
+	        		});
+	        		
+	        		naver.maps.Event.addListener(marker, "click", function(e) {
+	        		    if (infowindow.getMap()) {
+	        		        infowindow.close();
+	        		    } else {
+	        		        infowindow.open(map, marker);
+	        		    }
+	        		});
+	        		
 	    		});
+	    		
+	    		
 	    	});
 	    });
 	}
 	
 	
+	
+	
     naver.maps.Event.addListener(map, "dragend", function(e) {
-    		viewFn(map.getCenter().lat(),map.getCenter().lng());
-    		request = true;
-    	
+    	viewFn(map.getCenter().lat(),map.getCenter().lng());
     });
     
     
     naver.maps.Event.addListener(map, "center_changed", function(e) {
-    	
-    		viewFn(map.getCenter().lat(),map.getCenter().lng());
-    		init = true;
+    	viewFn(map.getCenter().lat(),map.getCenter().lng());
     	
     });
     
