@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>간단한 지도 표시하기</title>
+    <script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=dl4sr4ygcb"></script>
+    <script src = "https://code.jquery.com/jquery-3.2.1.min.js"> </script>
+</head>
+
+<body>
+
+	<div id="map" style="width:100%;height:900px;"></div>
+
+	<script>
+	
+	var center_lat = 37.498566;
+	var center_lng = 127.028036;
+	
+	var suwon_lat = 37.258302;
+	var suwon_lng = 127.023449;
+	var range = 1000;
+	
+	var mask_lat = suwon_lat;
+	var mask_lng = suwon_lng;
+	
+	var mapOptions = 
+	{
+	    center: new naver.maps.LatLng(suwon_lat, suwon_lng),
+	    zoom: 16
+	    
+	};
+	
+	var map = new naver.maps.Map('map', mapOptions);
+	
+	viewFn(37.258302,127.023449);
+	
+	function viewFn(lat,lng)
+	{
+		var markerOptions;
+		var imgurl;
+		var url = 'https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?';
+		
+		if(map.zoom<=22){
+			range = "500";
+		}else if(map.zoom<=20){
+			range = "1000";
+		}else if(map.zoom<=18){
+			range = "2000";
+		}else if(map.zoom<=16){
+			range = "3000";
+		}else if(map.zoom<=14){
+			range = "5000";
+		}else {
+			return ;
+		}
+		
+		var urlParam= "lat=" + lat + "&lng=" + lng + "&m=" + range;
+		
+	    $(document).ready(function()
+	    { 
+	    	$.getJSON(url+urlParam, function(data)
+	    		{
+	    		var html = [];
+	    		$.each(data["stores"], function(i, item) 
+	    		{
+	    			mask_lat = item.lat;
+	    			mask_lng = item.lng;
+	    			
+	    			 if(item.remain_stat == "plenty")
+			        {
+	   					imgurl = '/resources/images/mask_green.png';
+			        }
+			        else if(item.remain_stat == "some")
+		        	{
+			        	imgurl = '/resources/images/mask_yellow.png';
+		        	}
+			        else if(item.remain_stat == "few")
+		        	{
+			        	imgurl = '/resources/images/mask_red.png';
+		        	}
+			        else
+		        	{
+			        	imgurl = '/resources/images/mask_gray.png';
+		        	}
+	    			
+	    			markerOptions = 
+	    			{
+	    				position: new naver.maps.LatLng(mask_lat, mask_lng),
+	    			    map: map,
+	    			  	
+	    			    icon: {
+	    			        url: imgurl,
+	    			        size: new naver.maps.Size(50, 50),
+	    			        origin: new naver.maps.Point(0, 0),
+	    			        anchor: new naver.maps.Point(11, 35)
+	    			    }
+	    			
+	    			};
+	        		var marker = new naver.maps.Marker(markerOptions);
+	    		});
+	    	});
+	    });
+	}
+	
+	
+    naver.maps.Event.addListener(map, "dragend", function(e) {
+    		viewFn(map.getCenter().lat(),map.getCenter().lng());
+    		request = true;
+    	
+    });
+    
+    
+    naver.maps.Event.addListener(map, "center_changed", function(e) {
+    	
+    		viewFn(map.getCenter().lat(),map.getCenter().lng());
+    		init = true;
+    	
+    });
+    
+	
+		
+	//alert(window.HOME_PATH);
+	</script>
+	</body>
+</html>
