@@ -10,7 +10,7 @@
 </head>
 
 <body>
-
+	<h1>공적마스크 재고 현황 조회 사이트</h1>
 	<div id="map" style="width:100%;height:900px;"></div>
 
 	<script>
@@ -24,6 +24,7 @@
 	
 	var mask_lat = suwon_lat;
 	var mask_lng = suwon_lng;
+	var markers = [];
 	
 	var mapOptions = 
 	{
@@ -69,31 +70,62 @@
 	    			mask_lat = item.lat;
 	    			mask_lng = item.lng;
 	    			
-	    			 if(item.remain_stat == "plenty")
-			        {
-	   					imgurl = '/website/resources/images/mask_green.png';
-	   					remain_stat_temp = "100개 이상";
-			        }
-			        else if(item.remain_stat == "some")
-		        	{
-			        	imgurl = '/website/resources/images/mask_yellow.png';
-			        	remain_stat_temp = "30개 이상 100개미만";
-		        	}
-			        else if(item.remain_stat == "few")
-		        	{
-			        	imgurl = '/website/resources/images/mask_red.png';
-			        	remain_stat_temp = "2개 이상 30개 미만";
-		        	}
-			        else if(item.remain_stat == "empty")
-		        	{
-			        	imgurl = '/website/resources/images/mask_gray.png';
-			        	remain_stat_temp = "1개 이하";
-		        	}
-			        else
-		        	{
-			        	imgurl = '/website/resources/images/mask_sale_stop.png';
-			        	remain_stat_temp = "판매중지";
-		        	}
+	    			if(document.location.href == "http://localhost:8080/")
+	    			{
+	    				if(item.remain_stat == "plenty")
+				        {
+		   					imgurl = '/resources/images/mask_green.png';
+		   					remain_stat_temp = "100개 이상";
+				        }
+				        else if(item.remain_stat == "some")
+			        	{
+				        	imgurl = '/resources/images/mask_yellow.png';
+				        	remain_stat_temp = "30개 이상 100개미만";
+			        	}
+				        else if(item.remain_stat == "few")
+			        	{
+				        	imgurl = '/resources/images/mask_red.png';
+				        	remain_stat_temp = "2개 이상 30개 미만";
+			        	}
+				        else if(item.remain_stat == "empty")
+			        	{
+				        	imgurl = '/resources/images/mask_gray.png';
+				        	remain_stat_temp = "1개 이하";
+			        	}
+				        else
+			        	{
+				        	imgurl = '/resources/images/mask_sale_stop.png';
+				        	remain_stat_temp = "판매중지";
+			        	}
+	    			}
+	    			else
+	    			{
+		    			if(item.remain_stat == "plenty")
+				        {
+		   					imgurl = '/website/resources/images/mask_green.png';
+		   					remain_stat_temp = "100개 이상";
+				        }
+				        else if(item.remain_stat == "some")
+			        	{
+				        	imgurl = '/website/resources/images/mask_yellow.png';
+				        	remain_stat_temp = "30개 이상 100개미만";
+			        	}
+				        else if(item.remain_stat == "few")
+			        	{
+				        	imgurl = '/website/resources/images/mask_red.png';
+				        	remain_stat_temp = "2개 이상 30개 미만";
+			        	}
+				        else if(item.remain_stat == "empty")
+			        	{
+				        	imgurl = '/website/resources/images/mask_gray.png';
+				        	remain_stat_temp = "1개 이하";
+			        	}
+				        else
+			        	{
+				        	imgurl = '/website/resources/images/mask_sale_stop.png';
+				        	remain_stat_temp = "판매중지";
+			        	}
+	    			}
 	    			
 	    			markerOptions = 
 	    			{
@@ -109,7 +141,7 @@
 	    			
 	    			};
 	        		var marker = new naver.maps.Marker(markerOptions);
-	        		//console.log("test : "+imgurl);
+	        		markers.push(marker);
 	        		
 	        		var contentString = [
 	        	        '<div class="iw_inner">',
@@ -133,19 +165,36 @@
 	        		    }
 	        		});
 	        		
+	        		naver.maps.Event.addListener(map, "click", function(e) {
+	        		    infowindow.close();
+	        		});
+	        		
 	    		});
-	    		
+
+        		
 	    		
 	    	});
 	    });
 	}
 	
+	function reSetMaker()
+	{
+		for (var i = 0, leng = markers.length; i < leng ; i++)
+		{
+			markers[i].setMap(null);
+		}
+	}
+	
+	
+	
     naver.maps.Event.addListener(map, "dragend", function(e) {
+    	reSetMaker();
     	viewFn(map.getCenter().lat(),map.getCenter().lng());
     });
     
     
     naver.maps.Event.addListener(map, "center_changed", function(e) {
+    	reSetMaker();
     	viewFn(map.getCenter().lat(),map.getCenter().lng());
     	
     });
